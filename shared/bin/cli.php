@@ -37,6 +37,8 @@ switch ($command) {
     case 'generate':
         if ($case === 'soc-2') {
             require __DIR__ . '/generate-soc2.php';
+        } elseif ($case === 'soc-3') {
+            require __DIR__ . '/generate-soc3.php';
         } else {
             require __DIR__ . '/generate-soc1.php';
         }

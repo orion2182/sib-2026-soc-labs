@@ -43,13 +43,27 @@ Updated 2026-11-10.
   Train and holdout both TP=3 FP=0 FN=2 TN=19; deterministic repeat.
 - Student package verified standalone; no instructor files.
 
+### SOC-3 DNS/network beacon (feature 004)
+
+- 26 training and 26 holdout events across DNS, connection, and IDS sources.
+- Six near-300-second sync lookups followed by small TLS flows, two corroborating
+  alerts, hourly vendor update polling, and an alert without corroborating traffic.
+- Holdout uses different hosts, domain, address, and flow ids.
+- Reference rule: DNS query containing `sync` followed by a TCP connection by host
+  within 60 s. Train and holdout both TP=12 FP=0 FN=2 TN=12; deterministic repeat.
+- Student package verified standalone; no instructor files.
+
+## Theme status
+
+All three SOC cases are implemented, tested, and packaged. Detection is
+reproducible from event IDs and holdout scoring is mentor-only.
+
 ## Not built yet
 
-- SOC-3 DNS/network beacon (feature 004): Zeek/Suricata-style records, interval
-  analysis, holdout, reference rule, package.
 - Blind pilot and cross-case difficulty calibration.
 - Sigma mapping document: the engine uses a documented JSON rule format; a Sigma
   translation note is still required by the shared spec where Sigma fits.
+- Per-case mentor answer narratives beyond the reference rule and expected metrics.
 
 ## How to verify
 

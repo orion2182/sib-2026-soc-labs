@@ -1,0 +1,78 @@
+{
+    "case_id": "SOC-3",
+    "schema_version": "1.0.0",
+    "event_labels": {
+        "SOC3-T-0001": "benign",
+        "SOC3-T-0002": "benign",
+        "SOC3-T-0003": "benign",
+        "SOC3-T-0004": "benign",
+        "SOC3-T-0005": "benign",
+        "SOC3-T-0006": "benign",
+        "SOC3-T-0007": "malicious",
+        "SOC3-T-0008": "malicious",
+        "SOC3-T-0009": "malicious",
+        "SOC3-T-0010": "malicious",
+        "SOC3-T-0011": "malicious",
+        "SOC3-T-0012": "malicious",
+        "SOC3-T-0013": "malicious",
+        "SOC3-T-0014": "malicious",
+        "SOC3-T-0015": "malicious",
+        "SOC3-T-0016": "malicious",
+        "SOC3-T-0017": "malicious",
+        "SOC3-T-0018": "malicious",
+        "SOC3-T-0019": "malicious",
+        "SOC3-T-0020": "malicious",
+        "SOC3-T-0021": "benign",
+        "SOC3-T-0022": "benign",
+        "SOC3-T-0023": "benign",
+        "SOC3-T-0024": "benign",
+        "SOC3-T-0025": "benign",
+        "SOC3-T-0026": "benign"
+    },
+    "sequences": [
+        {
+            "sequence_id": "SEQ-BEACON-T1",
+            "label": "malicious",
+            "title": "Periodic DNS and callback pattern",
+            "event_ids": [
+                "SOC3-T-0007",
+                "SOC3-T-0008",
+                "SOC3-T-0009",
+                "SOC3-T-0010",
+                "SOC3-T-0011",
+                "SOC3-T-0012",
+                "SOC3-T-0013",
+                "SOC3-T-0014",
+                "SOC3-T-0015",
+                "SOC3-T-0016",
+                "SOC3-T-0017",
+                "SOC3-T-0018",
+                "SOC3-T-0019",
+                "SOC3-T-0020"
+            ],
+            "explanation": "Six near-300-second lookups, small TLS flows, and two corroborating alerts."
+        },
+        {
+            "sequence_id": "SEQ-UPD-T1",
+            "label": "benign",
+            "title": "Approved hourly update polling",
+            "event_ids": [
+                "SOC3-T-0021",
+                "SOC3-T-0022",
+                "SOC3-T-0023",
+                "SOC3-T-0024",
+                "SOC3-T-0025"
+            ],
+            "explanation": "Hourly poll from updater.exe to an approved vendor, with one low-severity alert."
+        },
+        {
+            "sequence_id": "SEQ-ALERT-T1",
+            "label": "benign",
+            "title": "Alert without traffic",
+            "event_ids": [
+                "SOC3-T-0026"
+            ],
+            "explanation": "An IDS alert with no DNS or connection evidence."
+        }
+    ]
+}
