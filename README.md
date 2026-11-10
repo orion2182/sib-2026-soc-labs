@@ -1,30 +1,65 @@
-# SOC Labs 2026 — Spec Kit workspace
+# SOC Labs 2026 — workspace pembangunan deteksi
 
-Instructor-only builder workspace for **three distinct SOC final-project cases**: API account takeover, suspicious endpoint execution, and DNS/network beaconing. Spec Kit 1.2.3 with Codex skills is installed locally. **The datasets, replay tool, and rules have not been implemented yet.**
+Repository publik ini menyiapkan lab **SOC/detection engineering untuk 3 kelompok SIB**. Setiap kelompok menerima operasi berbeda dan harus membangun hipotesis, menulis aturan/query, menghitung metrik, men-tune noise, melakukan triase, serta menentukan eskalasi. Kalender: 20 November–23 Desember 2026. Riset pedagogis lengkap berada di `docs/reference/Riset-Lab-SOC-2026.md` dan [repo perencanaan](https://github.com/orion2182/sib-2026-cybersecurity-final-project).
 
-| Path | Role |
+**Status per 10 November 2026:** Spec Kit 1.2.3, integrasi OpenCode/Codex, konstitusi, dan empat spesifikasi sudah tersedia. **Dataset, generator, viewer/query, aturan referensi, label holdout, dan pilot belum dibangun.**
+
+## Tiga kasus yang harus berbeda
+
+| Kasus | Sumber bukti sintetis | Keputusan inti | Noise yang wajib ada |
+| --- | --- | --- | --- |
+| SOC-1 — Account takeover API | Log autentikasi, sesi, dan audit API | Korelasikan login, perubahan sesi, dan akses objek; tentukan severity | Perjalanan sah, retry login, admin terjadwal |
+| SOC-2 — Eksekusi endpoint | Event Windows/Sysmon dalam JSON inert dan inventaris host | Rekonstruksi rantai parent-child process, pilih host/akun untuk eskalasi | Script helpdesk dan deployment IT sah |
+| SOC-3 — Beacon DNS/jaringan | Zeek DNS/conn dan Suricata EVE sintetis | Ukur pola periodik dan korelasi lintas sensor | Update otomatis dan polling layanan sah |
+
+Tiap kasus harus memiliki skema, dataset latihan berlabel, holdout tanpa label untuk mahasiswa, label holdout privat mentor, contoh normal, aturan referensi, serta kunci penjelasan berbasis event ID. Kunci dan label privat **tidak boleh di-commit ke repo publik**. Mahasiswa mengerjakan Q1–Q12 dengan raw event, metrik TP/FP/FN/TN, contoh triase, tiket eskalasi, dan runbook. Deteksi satu IOC tanpa konteks tidak cukup.
+
+## Peta file untuk OpenCode
+
+| File/direktori | Fungsi |
 | --- | --- |
-| `.specify/memory/constitution.md` | Shared build and release rules |
-| `specs/001-replay-evaluation-harness/spec.md` | Schema, replay/query, metrics, holdout, packaging |
-| `specs/002-api-account-takeover/spec.md` | SOC-1 case contract |
-| `specs/003-endpoint-execution/spec.md` | SOC-2 case contract |
-| `specs/004-dns-network-beacon/spec.md` | SOC-3 case contract |
-| `docs/reference/Riset-Lab-SOC-2026.md` | Frozen research/planning source; not a student handout |
-| `shared/`, `cases/` | Reserved implementation locations |
+| `AGENTS.md` | Instruksi proyek otomatis untuk OpenCode |
+| `.specify/memory/constitution.md` | Aturan desain, bukti, keselamatan, dan rilis |
+| `specs/001-replay-evaluation-harness/spec.md` | Kontrak schema, replay/query, evaluasi, freeze, dan packaging |
+| `specs/002-api-account-takeover/spec.md` | Kontrak SOC-1 |
+| `specs/003-endpoint-execution/spec.md` | Kontrak SOC-2 |
+| `specs/004-dns-network-beacon/spec.md` | Kontrak SOC-3 |
+| `docs/reference/Riset-Lab-SOC-2026.md` | Task mahasiswa, rubrik, timeline, dan sumber riset |
+| `shared/`, `cases/` | Lokasi implementasi saat dibangun |
+| `.opencode/commands/` | Perintah Spec Kit untuk OpenCode |
+| `scripts/select_feature.py` | Pemilih fitur aktif lokal |
 
-## Continue with Spec Kit
+## Mulai di laptop lain
 
-Open Codex from this directory. The Spec Kit commands are **Codex skills, not shell commands**. Run for the active feature:
+Prasyarat awal: Git, Python 3.11+, dan OpenCode. SIEM penuh atau Docker tidak wajib untuk alur peserta; pilih viewer/query ringan saat membuat rencana.
 
-1. `$speckit-plan` — select implementation architecture and data format against its spec.
-2. `$speckit-checklist` — review requirement completeness.
-3. `$speckit-tasks` — create ordered implementation tasks.
-4. `$speckit-analyze` — check spec, plan, and task consistency.
-5. `$speckit-implement` — build the feature.
-6. `$speckit-converge` — close remaining gaps.
+```bash
+git clone https://github.com/orion2182/sib-2026-soc-labs.git
+cd sib-2026-soc-labs
+python3 scripts/select_feature.py 001-replay-evaluation-harness
+opencode
+```
 
-The initial active feature is the replay/evaluation harness. For another case, change `.specify/feature.json` to `{"feature_directory":"specs/002-api-account-takeover"}` (or the corresponding `003`/`004` directory) and repeat. That pointer is local, ignored by Git. Work in this order: harness, SOC-1, SOC-2, SOC-3, then blind pilot and rebalance. Do not rerun `$speckit-specify` for these existing feature specs unless changing their scope intentionally.
+Pada Windows gunakan `py -3 scripts/select_feature.py 001-replay-evaluation-harness` jika perlu. Di chat OpenCode, jalankan satu per satu:
 
-## Release gate
+```text
+/speckit.plan
+/speckit.checklist
+/speckit.tasks
+/speckit.analyze
+/speckit.implement
+/speckit.converge
+```
 
-Each case needs a schema, labeled training set, unlabeled student holdout, private holdout labels, reference rule, normal-noise counterexamples, answer key, and student card covering Q1–Q12. Freeze the candidate rule before holdout scoring. Verify event/label consistency, reproducible metrics, package separation, no personal data or active callback, and usability on representative laptops before distributing anything.
+Perintah tersebut tersedia di repository, jadi `specify init` tidak perlu diulang. Untuk fitur berikutnya, lihat pilihan dengan `python3 scripts/select_feature.py --list`, pilih fitur yang diinginkan, lalu mulai sesi baru. Urutan pembangunan: harness → SOC-1 → SOC-2 → SOC-3 → pilot buta dan penyeimbangan tingkat kesulitan. [Referensi integrasi OpenCode Spec Kit](https://github.github.com/spec-kit/integrations/opencode.html).
+
+## Gerbang rilis mentor
+
+1. Semua event punya ID unik, sumber, timestamp dan zona waktu, schema version, serta hash/manifest yang dapat diverifikasi.
+2. Training dan holdout dipisahkan. Aturan mahasiswa dibekukan sebelum evaluasi holdout; label privat tidak muncul pada paket atau feedback dini.
+3. Metrik dapat dihitung ulang dari unit evaluasi yang jelas (event atau sequence); noise sah dan gap telemetri terdokumentasi.
+4. Tiga paket hanya berisi kasus masing-masing, pertanyaan, data dictionary, training set, holdout tanpa label, dan alat yang diizinkan.
+5. Data sepenuhnya sintetis; tidak ada malware aktif, callback internet, log kampus nyata, atau data pribadi nyata.
+6. Pilot pada laptop 8 GB mengukur waktu buka, query, RAM, dan kesetaraan tiga kasus. Target awal ukuran dataset <1 GB per kasus harus diverifikasi.
+
+Repository ini adalah bahan pembangun lab, bukan handout mahasiswa. Materi penilaian privat disimpan di luar GitHub publik.

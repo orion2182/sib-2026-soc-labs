@@ -16,7 +16,7 @@ Each case MUST include legitimate activity that resembles the suspicious pattern
 
 ### IV. Safe, separate distribution
 
-All identities, hosts, domains, addresses, and records MUST be synthetic. Documentation-only addresses and reserved domains SHOULD be used. No lab step may require scanning external systems, active malware, callbacks, or live campus telemetry. Each group MUST receive only its assigned case. Reference rules, holdout labels, scenario truth, and pilot observations MUST remain instructor-only.
+All identities, hosts, domains, addresses, and records MUST be synthetic. Documentation-only addresses and reserved domains SHOULD be used. No lab step may require scanning external systems, active malware, callbacks, or live campus telemetry. Each group MUST receive only its assigned case. Reference rules, holdout labels, scenario truth, and pilot observations MUST remain instructor-only and outside this public repository.
 
 ### V. Lightweight, inspectable operation
 

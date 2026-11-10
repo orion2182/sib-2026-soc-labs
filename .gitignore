@@ -12,6 +12,11 @@ dist/
 build/
 runtime-data/
 artifacts/
+instructor-private/
+holdout-private/
+secrets/
+*.pem
+*.key
 *.db
 *.sqlite*
 *.log
