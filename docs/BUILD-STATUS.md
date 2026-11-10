@@ -58,12 +58,11 @@ Updated 2026-11-10.
 All three SOC cases are implemented, tested, and packaged. Detection is
 reproducible from event IDs and holdout scoring is mentor-only.
 
-## Not built yet
+## Remaining before release
 
-- Blind pilot and cross-case difficulty calibration.
-- Sigma mapping document: the engine uses a documented JSON rule format; a Sigma
-  translation note is still required by the shared spec where Sigma fits.
-- Per-case mentor answer narratives beyond the reference rule and expected metrics.
+- Pilot buta manusia dan kalibrasi antarkasus; dry pilot agen sudah dilakukan (`docs/PILOT-BLIND-2026-11-10.md`).
+- Narasi jawaban mentor per kasus dan pemeriksaan rilis peserta.
+- Pemetaan Sigma sudah terdokumentasi di `docs/SIGMA-MAPPING.md`; keterbatasan engine JSON tetap perlu dijelaskan saat pengajaran.
 
 ## How to verify
 

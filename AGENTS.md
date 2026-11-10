@@ -12,6 +12,6 @@
 
 ## OpenCode handoff
 
-- The repository contains specifications, not runnable datasets or scoring tools. Build the replay/evaluation harness first, then SOC-1, SOC-2, and SOC-3. Preserve the 20 November–23 December 2026 calendar and Q1–Q12.
-- OpenCode loads this file from the repository root. Use `python3 scripts/select_feature.py --list` and select a feature before the interactive `/speckit.plan`, `/speckit.tasks`, and `/speckit.implement` commands.
-- A case is complete only when event/label integrity, normal-noise counterexamples, reproducible metrics, training/holdout separation, package isolation, and a representative-device pilot pass.
+- Tiga kasus dan harness replay/evaluasi sudah diimplementasikan. Lihat `docs/BUILD-STATUS.md`, `docs/WINDOWS-SETUP.md`, dan `docs/PILOT-BLIND-2026-11-10.md`; lanjutkan pilot buta manusia dan pemeriksaan rilis. Pertahankan kalender 20 November–23 Desember 2026 dan Q1–Q12.
+- OpenCode membaca file ini dari root repo. Pada Windows tanpa Python, gunakan `.\scripts\select-feature.ps1 --list` dan pilih fitur sebelum perintah Spec Kit interaktif. `scripts/select_feature.py` hanya alternatif.
+- Perubahan kasus harus menjaga integritas event/label, noise normal, metrik reproduktif, pemisahan holdout, isolasi paket, dan pilot pada perangkat perwakilan.
