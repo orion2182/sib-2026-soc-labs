@@ -32,10 +32,19 @@ Updated 2026-11-10.
 - Student package (24 KB) verified standalone: validate, viewer, training
   evaluation all work; no private file is present.
 
+### SOC-2 suspicious endpoint execution (feature 003)
+
+- 24 training and 24 holdout events; endpoint, inventory, and maintenance sources.
+- Malicious document-to-PowerShell-to-callback chain, approved helpdesk and
+  deployment lookalikes, an orphan process with missing parent telemetry, and PID
+  reuse.
+- Holdout uses different hosts and a different destination.
+- Reference rule: winword → powershell → network by host within 900 s.
+  Train and holdout both TP=3 FP=0 FN=2 TN=19; deterministic repeat.
+- Student package verified standalone; no instructor files.
+
 ## Not built yet
 
-- SOC-2 endpoint execution (feature 003): Sysmon-style process chains, host
-  inventory, maintenance calendar, holdout, reference rule, package.
 - SOC-3 DNS/network beacon (feature 004): Zeek/Suricata-style records, interval
   analysis, holdout, reference rule, package.
 - Blind pilot and cross-case difficulty calibration.

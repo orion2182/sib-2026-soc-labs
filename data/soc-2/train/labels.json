@@ -1,0 +1,87 @@
+{
+    "case_id": "SOC-2",
+    "schema_version": "1.0.0",
+    "event_labels": {
+        "SOC2-T-0001": "benign",
+        "SOC2-T-0002": "benign",
+        "SOC2-T-0003": "benign",
+        "SOC2-T-0004": "benign",
+        "SOC2-T-0005": "benign",
+        "SOC2-T-0006": "benign",
+        "SOC2-T-0007": "benign",
+        "SOC2-T-0008": "benign",
+        "SOC2-T-0009": "benign",
+        "SOC2-T-0010": "benign",
+        "SOC2-T-0011": "malicious",
+        "SOC2-T-0012": "malicious",
+        "SOC2-T-0013": "malicious",
+        "SOC2-T-0014": "malicious",
+        "SOC2-T-0015": "malicious",
+        "SOC2-T-0016": "benign",
+        "SOC2-T-0017": "benign",
+        "SOC2-T-0018": "benign",
+        "SOC2-T-0019": "benign",
+        "SOC2-T-0020": "benign",
+        "SOC2-T-0021": "benign",
+        "SOC2-T-0022": "benign",
+        "SOC2-T-0023": "benign",
+        "SOC2-T-0024": "benign"
+    },
+    "sequences": [
+        {
+            "sequence_id": "SEQ-EPR-T1",
+            "label": "malicious",
+            "title": "Document to encoded PowerShell to callback",
+            "event_ids": [
+                "SOC2-T-0010",
+                "SOC2-T-0011",
+                "SOC2-T-0012",
+                "SOC2-T-0013",
+                "SOC2-T-0014",
+                "SOC2-T-0015"
+            ],
+            "explanation": "Winword spawns encoded PowerShell, writes a temp script, connects out, then stages a file."
+        },
+        {
+            "sequence_id": "SEQ-HD-T1",
+            "label": "benign",
+            "title": "Approved helpdesk script",
+            "event_ids": [
+                "SOC2-T-0016",
+                "SOC2-T-0017",
+                "SOC2-T-0018"
+            ],
+            "explanation": "Signed IT script from the deployment agent inside the maintenance window."
+        },
+        {
+            "sequence_id": "SEQ-DEP-T1",
+            "label": "benign",
+            "title": "Approved software deployment",
+            "event_ids": [
+                "SOC2-T-0019",
+                "SOC2-T-0020",
+                "SOC2-T-0021"
+            ],
+            "explanation": "Signed deployment from the agent with a maintenance record."
+        },
+        {
+            "sequence_id": "SEQ-ORP-T1",
+            "label": "benign",
+            "title": "Orphan process with missing parent telemetry",
+            "event_ids": [
+                "SOC2-T-0022"
+            ],
+            "explanation": "Suspicious shape but no network or parent evidence; not a confirmed chain."
+        },
+        {
+            "sequence_id": "SEQ-PID-T1",
+            "label": "benign",
+            "title": "PID reuse",
+            "event_ids": [
+                "SOC2-T-0023",
+                "SOC2-T-0024"
+            ],
+            "explanation": "Same pid, different process GUIDs and images."
+        }
+    ]
+}

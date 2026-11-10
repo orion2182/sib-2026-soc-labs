@@ -35,7 +35,11 @@ $caseDir = soc_case_dir($root, $case);
 
 switch ($command) {
     case 'generate':
-        require __DIR__ . '/generate-soc1.php';
+        if ($case === 'soc-2') {
+            require __DIR__ . '/generate-soc2.php';
+        } else {
+            require __DIR__ . '/generate-soc1.php';
+        }
         break;
 
     case 'validate':
