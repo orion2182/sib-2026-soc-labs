@@ -21,6 +21,18 @@ $counter = [];
 
 $sensors = ['auth' => 'auth-api-1', 'session' => 'session-svc-1', 'api' => 'api-gateway-1'];
 
+// Notes must describe the record, never the analyst conclusion. Ground-truth
+// narration in a note makes a trivial "note contains ..." rule score well.
+function neutral_note(string $type): string
+{
+    return match (true) {
+        str_starts_with($type, 'auth.') => 'authentication record',
+        str_starts_with($type, 'session.') => 'session record',
+        str_starts_with($type, 'api.') => 'api record',
+        default => 'source record',
+    };
+}
+
 /**
  * Build one event, record its label, and attach it to an optional sequence.
  */
@@ -53,6 +65,7 @@ function makeEvent(
         'outcome' => 'success',
         'note' => '',
     ], $fields);
+    $event['note'] = neutral_note((string) $event['event_type']);
     $events[] = $event;
     $labels['event_labels'][$id] = $label;
     if ($seqId !== null) {
@@ -67,7 +80,7 @@ $add = static function (
     string $time,
     array $fields,
     string $label,
-    ?string $seqId
+    ?string $seqId = null
 ) use (&$trainEvents, &$trainLabels, &$seqEvents, &$counter, $sensors): string {
     return makeEvent($prefix, $source, $time, $fields, $label, $seqId, $trainEvents, $trainLabels, $seqEvents, $counter, $sensors);
 };
@@ -112,43 +125,71 @@ foreach ($baseline as [$account, $time, $ip, $geo, $device, $session, $object]) 
     ], 'benign', $seq);
 }
 
+// --- Victim baseline earlier the same day ---------------------------------
+$vic = new DateTimeImmutable($T . '01:00:00+07:00');
+$add($tp, 'auth', $vic->format('c'), [
+    'account' => 'nadia@kampus.test', 'event_type' => 'auth.login', 'outcome' => 'success',
+    'session_id' => 'S-NAD-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '198.51.100.64',
+    'geo' => 'Jakarta',
+], 'benign');
+$add($tp, 'session', $vic->modify('+1 second')->format('c'), [
+    'account' => 'nadia@kampus.test', 'event_type' => 'session.created', 'outcome' => 'success',
+    'session_id' => 'S-NAD-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '198.51.100.64',
+    'geo' => 'Jakarta',
+], 'benign');
+$add($tp, 'api', $vic->modify('+2 minutes')->format('c'), [
+    'account' => 'nadia@kampus.test', 'event_type' => 'api.object.read', 'outcome' => 'success',
+    'session_id' => 'S-NAD-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '198.51.100.64',
+    'geo' => 'Jakarta', 'object_type' => 'student_record', 'object_id' => 'STU-1050', 'bytes' => 900,
+], 'benign');
+$add($tp, 'api', $vic->modify('+4 minutes')->format('c'), [
+    'account' => 'nadia@kampus.test', 'event_type' => 'api.object.read', 'outcome' => 'success',
+    'session_id' => 'S-NAD-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '198.51.100.64',
+    'geo' => 'Jakarta', 'object_type' => 'course', 'object_id' => 'COURSE-301', 'bytes' => 1500,
+], 'benign');
+$add($tp, 'auth', $vic->modify('+20 minutes')->format('c'), [
+    'account' => 'nadia@kampus.test', 'event_type' => 'auth.logout', 'outcome' => 'success',
+    'session_id' => 'S-NAD-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '198.51.100.64',
+    'geo' => 'Jakarta',
+], 'benign');
+
 // --- Intended chain: credential stuffing then bulk object access ----------
 $atoBase = new DateTimeImmutable($T . '02:10:00+07:00');
 for ($i = 0; $i < 5; $i++) {
     $add($tp, 'auth', $atoBase->modify("+{$i}0 seconds")->format('c'), [
         'account' => 'nadia@kampus.test', 'event_type' => 'auth.login', 'outcome' => 'failure',
-        'device_id' => 'dev-unknown-1', 'src_ip' => '203.0.113.77', 'geo' => 'VPN exit (synthetic)',
+        'device_id' => 'dev-nadia-2019', 'src_ip' => '203.0.113.77', 'geo' => 'Jakarta',
         'note' => 'Failed sign-in from an unfamiliar device and address.',
     ], 'malicious', 'SEQ-ATO-T1');
 }
 $add($tp, 'auth', $atoBase->modify('+2 minutes 30 seconds')->format('c'), [
     'account' => 'nadia@kampus.test', 'event_type' => 'auth.login', 'outcome' => 'success',
-    'session_id' => 'S-ATO-1', 'device_id' => 'dev-unknown-1', 'src_ip' => '203.0.113.77',
-    'geo' => 'VPN exit (synthetic)', 'note' => 'Successful sign-in after repeated failures.',
+    'session_id' => 'S-ATO-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '203.0.113.77',
+    'geo' => 'Jakarta', 'note' => 'Successful sign-in after repeated failures.',
 ], 'malicious', 'SEQ-ATO-T1');
 $add($tp, 'session', $atoBase->modify('+2 minutes 31 seconds')->format('c'), [
     'account' => 'nadia@kampus.test', 'event_type' => 'session.created', 'outcome' => 'success',
-    'session_id' => 'S-ATO-1', 'device_id' => 'dev-unknown-1', 'src_ip' => '203.0.113.77',
-    'geo' => 'VPN exit (synthetic)', 'note' => 'New session from the unfamiliar device.',
+    'session_id' => 'S-ATO-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '203.0.113.77',
+    'geo' => 'Jakarta', 'note' => 'New session from the unfamiliar device.',
 ], 'malicious', 'SEQ-ATO-T1');
 for ($i = 1; $i <= 12; $i++) {
     $add($tp, 'api', $atoBase->modify('+2 minutes 40 seconds')->modify('+' . ($i * 15) . ' seconds')->format('c'), [
         'account' => 'nadia@kampus.test', 'event_type' => 'api.object.read', 'outcome' => 'success',
-        'session_id' => 'S-ATO-1', 'device_id' => 'dev-unknown-1', 'src_ip' => '203.0.113.77',
-        'geo' => 'VPN exit (synthetic)', 'object_type' => 'student_record',
+        'session_id' => 'S-ATO-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '203.0.113.77',
+        'geo' => 'Jakarta', 'object_type' => 'student_record',
         'object_id' => sprintf('STU-%04d', 1100 + $i), 'bytes' => 880 + $i * 10,
         'note' => 'Sequential read of student records outside the account baseline.',
     ], 'malicious', 'SEQ-ATO-T1');
 }
 $add($tp, 'api', $atoBase->modify('+6 minutes')->format('c'), [
     'account' => 'nadia@kampus.test', 'event_type' => 'api.token.refresh', 'outcome' => 'success',
-    'session_id' => 'S-ATO-1', 'device_id' => 'dev-unknown-1', 'src_ip' => '203.0.113.77',
-    'geo' => 'VPN exit (synthetic)', 'note' => 'Token refreshed after bulk reads.',
+    'session_id' => 'S-ATO-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '203.0.113.77',
+    'geo' => 'Jakarta', 'note' => 'Token refreshed after bulk reads.',
 ], 'malicious', 'SEQ-ATO-T1');
 $add($tp, 'api', $atoBase->modify('+7 minutes')->format('c'), [
     'account' => 'nadia@kampus.test', 'event_type' => 'api.export', 'outcome' => 'success',
-    'session_id' => 'S-ATO-1', 'device_id' => 'dev-unknown-1', 'src_ip' => '203.0.113.77',
-    'geo' => 'VPN exit (synthetic)', 'object_type' => 'student_record_set', 'object_id' => 'SET-1101-1112',
+    'session_id' => 'S-ATO-1', 'device_id' => 'dev-nadia-2019', 'src_ip' => '203.0.113.77',
+    'geo' => 'Jakarta', 'object_type' => 'student_record_set', 'object_id' => 'SET-1101-1112',
     'bytes' => 48200, 'note' => 'Bulk export of the records read in this session.',
 ], 'malicious', 'SEQ-ATO-T1');
 
@@ -191,6 +232,11 @@ $add($tp, 'auth', $retry->modify('+50 seconds')->format('c'), [
     'account' => 'citra@kampus.test', 'event_type' => 'auth.login', 'outcome' => 'success',
     'session_id' => 'S-RET-1', 'device_id' => 'dev-citra-laptop', 'src_ip' => '203.0.113.20',
     'geo' => 'Surabaya', 'note' => 'Successful sign-in after a short retry sequence.',
+], 'benign', 'SEQ-RET-T1');
+$add($tp, 'session', $retry->modify('+51 seconds')->format('c'), [
+    'account' => 'citra@kampus.test', 'event_type' => 'session.created', 'outcome' => 'success',
+    'session_id' => 'S-RET-1', 'device_id' => 'dev-citra-laptop', 'src_ip' => '203.0.113.20',
+    'geo' => 'Surabaya',
 ], 'benign', 'SEQ-RET-T1');
 
 // --- Scheduled administrator maintenance ---------------------------------
@@ -246,6 +292,7 @@ $trainSequences = [
      'explanation' => 'Same source address as the suspicious chain but a known device and narrow access.'],
 ];
 $trainLabels['sequences'] = $trainSequences;
+$trainLabels['label_semantics'] = 'malicious = part of the confirmed takeover chain. benign = not part of a confirmed chain; benign does not mean safe.';
 
 // --- Holdout: same mechanics, different identities and addresses ---------
 $holdoutEvents = [];
@@ -259,6 +306,30 @@ $addH = static function (string $source, string $time, array $fields, string $la
 };
 
 $H = '2026-11-12T';
+
+// Victim baseline before the holdout incident.
+$hvic = new DateTimeImmutable($H . '01:00:00+07:00');
+$addH('auth', $hvic->format('c'), [
+    'account' => 'fajar@kampus.test', 'event_type' => 'auth.login', 'outcome' => 'success',
+    'session_id' => 'S-FAJ-1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.65',
+    'geo' => 'Bandung', 'role' => 'student',
+], 'benign', null);
+$addH('session', $hvic->modify('+1 second')->format('c'), [
+    'account' => 'fajar@kampus.test', 'event_type' => 'session.created', 'outcome' => 'success',
+    'session_id' => 'S-FAJ-1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.65',
+    'geo' => 'Bandung',
+], 'benign', null);
+$addH('api', $hvic->modify('+3 minutes')->format('c'), [
+    'account' => 'fajar@kampus.test', 'event_type' => 'api.object.read', 'outcome' => 'success',
+    'session_id' => 'S-FAJ-1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.65',
+    'geo' => 'Bandung', 'object_type' => 'student_record', 'object_id' => 'STU-5150', 'bytes' => 905,
+], 'benign', null);
+$addH('auth', $hvic->modify('+20 minutes')->format('c'), [
+    'account' => 'fajar@kampus.test', 'event_type' => 'auth.logout', 'outcome' => 'success',
+    'session_id' => 'S-FAJ-1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.65',
+    'geo' => 'Bandung',
+], 'benign', null);
+
 $hbaseline = [
     ['indra@kampus.test', '08:10:00', '198.51.100.31', 'Jakarta', 'dev-indra-laptop', 'S-IND-1', 'STU-4001'],
     ['maya@kampus.test', '08:30:00', '203.0.113.33', 'Medan', 'dev-maya-laptop', 'S-MAY-1', 'STU-4002'],
@@ -281,33 +352,33 @@ $hAto = new DateTimeImmutable($H . '03:20:00+07:00');
 for ($i = 0; $i < 4; $i++) {
     $addH('auth', $hAto->modify("+{$i}5 seconds")->format('c'), [
         'account' => 'fajar@kampus.test', 'event_type' => 'auth.login', 'outcome' => 'failure',
-        'device_id' => 'dev-unknown-9', 'src_ip' => '198.51.100.77', 'geo' => 'VPN exit (synthetic)',
+        'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.77', 'geo' => 'Jakarta',
         'note' => 'Failed sign-in from an unfamiliar device.', 'role' => 'student',
     ], 'malicious', 'SEQ-ATO-H1');
 }
 $addH('auth', $hAto->modify('+3 minutes')->format('c'), [
     'account' => 'fajar@kampus.test', 'event_type' => 'auth.login', 'outcome' => 'success',
-    'session_id' => 'S-ATO-H1', 'device_id' => 'dev-unknown-9', 'src_ip' => '198.51.100.77',
-    'geo' => 'VPN exit (synthetic)', 'note' => 'Success after repeated failures.',
+    'session_id' => 'S-ATO-H1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.77',
+    'geo' => 'Jakarta', 'note' => 'Success after repeated failures.',
 ], 'malicious', 'SEQ-ATO-H1');
 $addH('session', $hAto->modify('+3 minutes 1 second')->format('c'), [
     'account' => 'fajar@kampus.test', 'event_type' => 'session.created', 'outcome' => 'success',
-    'session_id' => 'S-ATO-H1', 'device_id' => 'dev-unknown-9', 'src_ip' => '198.51.100.77',
-    'geo' => 'VPN exit (synthetic)', 'note' => 'New session from the unfamiliar device.',
+    'session_id' => 'S-ATO-H1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.77',
+    'geo' => 'Jakarta', 'note' => 'New session from the unfamiliar device.',
 ], 'malicious', 'SEQ-ATO-H1');
 for ($i = 1; $i <= 9; $i++) {
     $addH('api', $hAto->modify('+3 minutes 10 seconds')->modify('+' . ($i * 15) . ' seconds')->format('c'), [
         'account' => 'fajar@kampus.test', 'event_type' => 'api.object.read', 'outcome' => 'success',
-        'session_id' => 'S-ATO-H1', 'device_id' => 'dev-unknown-9', 'src_ip' => '198.51.100.77',
-        'geo' => 'VPN exit (synthetic)', 'object_type' => 'student_record',
+        'session_id' => 'S-ATO-H1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.77',
+        'geo' => 'Jakarta', 'object_type' => 'student_record',
         'object_id' => sprintf('STU-%04d', 5100 + $i), 'bytes' => 860 + $i * 12,
         'note' => 'Sequential reads outside the account baseline.',
     ], 'malicious', 'SEQ-ATO-H1');
 }
 $addH('api', $hAto->modify('+5 minutes')->format('c'), [
     'account' => 'fajar@kampus.test', 'event_type' => 'api.token.refresh', 'outcome' => 'success',
-    'session_id' => 'S-ATO-H1', 'device_id' => 'dev-unknown-9', 'src_ip' => '198.51.100.77',
-    'geo' => 'VPN exit (synthetic)', 'note' => 'Token refresh after bulk reads.',
+    'session_id' => 'S-ATO-H1', 'device_id' => 'dev-fajar-2018', 'src_ip' => '198.51.100.77',
+    'geo' => 'Jakarta', 'note' => 'Token refresh after bulk reads.',
 ], 'malicious', 'SEQ-ATO-H1');
 
 $hTravel = new DateTimeImmutable($H . '09:15:00+07:00');
@@ -336,6 +407,11 @@ $addH('auth', $hRetry->modify('+30 seconds')->format('c'), [
     'session_id' => 'S-RET-H1', 'device_id' => 'dev-hana-laptop', 'src_ip' => '203.0.113.40',
     'geo' => 'Yogyakarta', 'note' => 'Success after a short retry sequence.', 'role' => 'student',
 ], 'benign', 'SEQ-RET-H1');
+$addH('session', $hRetry->modify('+31 seconds')->format('c'), [
+    'account' => 'hana@kampus.test', 'event_type' => 'session.created', 'outcome' => 'success',
+    'session_id' => 'S-RET-H1', 'device_id' => 'dev-hana-laptop', 'src_ip' => '203.0.113.40',
+    'geo' => 'Yogyakarta',
+], 'benign', 'SEQ-RET-H1');
 
 $hAdmin = new DateTimeImmutable($H . '01:30:00+07:00');
 $addH('auth', $hAdmin->format('c'), [
@@ -350,6 +426,7 @@ $addH('api', $hAdmin->modify('+4 minutes')->format('c'), [
     'note' => 'Change recorded in the maintenance calendar.',
 ], 'benign', 'SEQ-ADM-H1');
 
+$holdoutLabels['label_semantics'] = 'malicious = part of the confirmed takeover chain. benign = not part of a confirmed chain; benign does not mean safe.';
 $holdoutLabels['sequences'] = [
     ['sequence_id' => 'SEQ-ATO-H1', 'label' => 'malicious', 'title' => 'Credential stuffing to bulk reads',
      'event_ids' => $hseq['SEQ-ATO-H1'] ?? [], 'explanation' => 'Private holdout chain.'],

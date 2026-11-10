@@ -145,7 +145,7 @@ switch ($command) {
             'evaluator_sha256' => soc_sha256($root . '/shared/lib/soc.php'),
             'evaluator_version' => SOC_HARNESS_VERSION,
         ];
-        $out = (string) arg($argv, 'out', $root . '/instructor-private/' . $case . '/freeze.json');
+        $out = (string) arg($argv, 'out', $root . '/freeze.json');
         soc_json_write($out, $freeze);
         echo json_encode($freeze, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
         break;

@@ -1,7 +1,7 @@
 # Kartu kasus SOC-2 - Eksekusi endpoint mencurigakan
 
-**Untuk:** kelompok SOC-2 saja. **Dataset:** `data/soc-2/train/` (berlabel) dan
-`data/soc-2/holdout/` (tanpa label). **Kalender:** 20 November-18 Desember 2026.
+**Untuk:** kelompok SOC-2 saja. **Dataset:** `train/` (berlabel) dan
+`holdout/` (tanpa label). **Kalender:** 20 November-18 Desember 2026.
 
 ## Situasi
 
@@ -23,9 +23,9 @@ mencurigakan tanpa memblokir pekerjaan IT yang sah.
 
 | Artefak | Isi |
 | --- | --- |
-| `data/soc-2/train/events.jsonl` | Event latihan berlabel |
-| `data/soc-2/train/labels.json` | Label dan penjelasan rangkaian |
-| `data/soc-2/holdout/events.jsonl` | Holdout tanpa label |
+| `train/events.jsonl` | Event latihan berlabel |
+| `train/labels.json` | Label dan penjelasan rangkaian |
+| `holdout/events.jsonl` | Holdout tanpa label |
 | `schema.json` | Skema field |
 | `data-dictionary.md` | Arti field dan gap |
 | `shared/public/` | Viewer lokal |
@@ -39,6 +39,29 @@ powershell -ExecutionPolicy Bypass -File .\tools\soc.ps1 -Action validate -Case 
 powershell -ExecutionPolicy Bypass -File .\tools\soc.ps1 -Action evaluate -Case soc-2 -Rule .\my-rule.json -Split train
 powershell -ExecutionPolicy Bypass -File .\tools\soc.ps1 -Action freeze -Case soc-2 -Rule .\my-rule.json
 ```
+
+## Format aturan
+
+Aturan adalah JSON. Bentuk event-level:
+
+```json
+{"name":"x","where":{"all":[{"field":"event_type","op":"eq","value":"process.create"}]}}
+```
+
+Bentuk rangkaian:
+
+```json
+{"name":"y","group_by":"host","within_seconds":900,
+ "stages":[{ "all":[...] },{ "all":[...] }]}
+```
+
+Operator: `eq`, `ne`, `in`, `contains`, `startswith`, `gt`, `lt`, `exists`.
+Field harus ada di `schema.json`.
+
+Batasan engine: satu event dicocokkan per stage, `group_by` hanya satu field,
+tidak ada OR, aritmetika interval, atau join antar-field. Rangkaian yang lebih
+panjang dari stage akan menyisakan event sebagai FN; itu batas alat, bukan bukti
+deteksi gagal. Anda boleh memakai aturan event-level bila itu lebih tepat.
 
 ## Q1-Q12
 

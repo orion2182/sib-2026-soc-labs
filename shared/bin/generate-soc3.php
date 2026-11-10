@@ -12,6 +12,16 @@ $root = soc_root();
 $sensors = ['dns' => 'zeek-dns-1', 'conn' => 'zeek-conn-1', 'ids' => 'suricata-1'];
 $counter = [];
 
+function neutral_note(string $type): string
+{
+    return match (true) {
+        str_starts_with($type, 'dns.') => 'dns record',
+        str_starts_with($type, 'conn.') => 'connection record',
+        str_starts_with($type, 'ids.') => 'ids record',
+        default => 'source record',
+    };
+}
+
 function s3_event(
     string $prefix,
     string $source,
@@ -42,6 +52,7 @@ function s3_event(
         'outcome' => 'success',
         'note' => '',
     ], $fields);
+    $event['note'] = neutral_note((string) $event['event_type']);
     $events[] = $event;
     $labels['event_labels'][$id] = $label;
     if ($seqId !== null) {
@@ -102,7 +113,7 @@ function build_soc3(string $prefix, string $day, array &$events, array &$labels,
     ], 'malicious', 'SEQ-BEACON-T1');
     $add('ids', $base->modify('+899 seconds 3 seconds')->format('c'), [
         'host' => 'WS-0501', 'account' => 'appsvc@kampus.test', 'event_type' => 'ids.alert', 'outcome' => 'allowed',
-        'dest_ip' => '203.0.113.90', 'dest_port' => 443, 'proto' => 'tcp', 'flow_id' => 'F-BEACON-4',
+        'dest_ip' => '203.0.113.90', 'dest_port' => 443, 'proto' => 'tcp', 'flow_id' => 'F-BEACON-3',
         'signature' => 'ET-MALWARE Synthetic Beacon Pattern', 'category' => 'Potential C2', 'severity' => 1,
         'note' => 'Second corroborated alert later in the same pattern.',
     ], 'malicious', 'SEQ-BEACON-T1');
@@ -139,6 +150,7 @@ function build_soc3(string $prefix, string $day, array &$events, array &$labels,
         'note' => 'No matching DNS or connection record; the hypothesis remains unconfirmed.',
     ], 'benign', 'SEQ-ALERT-T1');
 
+    $labels['label_semantics'] = 'malicious = part of the confirmed beacon pattern. benign = not part of a confirmed incident; an uncorroborated alert may still deserve triage.';
     $labels['sequences'] = [
         ['sequence_id' => 'SEQ-BEACON-T1', 'label' => 'malicious', 'title' => 'Periodic DNS and callback pattern',
          'event_ids' => $seqEvents['SEQ-BEACON-T1'] ?? [], 'explanation' => 'Six near-300-second lookups, small TLS flows, and two corroborating alerts.'],

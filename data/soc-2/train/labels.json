@@ -12,12 +12,12 @@
         "SOC2-T-0008": "benign",
         "SOC2-T-0009": "benign",
         "SOC2-T-0010": "benign",
-        "SOC2-T-0011": "malicious",
+        "SOC2-T-0011": "benign",
         "SOC2-T-0012": "malicious",
         "SOC2-T-0013": "malicious",
         "SOC2-T-0014": "malicious",
         "SOC2-T-0015": "malicious",
-        "SOC2-T-0016": "benign",
+        "SOC2-T-0016": "malicious",
         "SOC2-T-0017": "benign",
         "SOC2-T-0018": "benign",
         "SOC2-T-0019": "benign",
@@ -25,7 +25,8 @@
         "SOC2-T-0021": "benign",
         "SOC2-T-0022": "benign",
         "SOC2-T-0023": "benign",
-        "SOC2-T-0024": "benign"
+        "SOC2-T-0024": "benign",
+        "SOC2-T-0025": "benign"
     },
     "sequences": [
         {
@@ -33,12 +34,11 @@
             "label": "malicious",
             "title": "Document to encoded PowerShell to callback",
             "event_ids": [
-                "SOC2-T-0010",
-                "SOC2-T-0011",
                 "SOC2-T-0012",
                 "SOC2-T-0013",
                 "SOC2-T-0014",
-                "SOC2-T-0015"
+                "SOC2-T-0015",
+                "SOC2-T-0016"
             ],
             "explanation": "Winword spawns encoded PowerShell, writes a temp script, connects out, then stages a file."
         },
@@ -47,9 +47,9 @@
             "label": "benign",
             "title": "Approved helpdesk script",
             "event_ids": [
-                "SOC2-T-0016",
                 "SOC2-T-0017",
-                "SOC2-T-0018"
+                "SOC2-T-0018",
+                "SOC2-T-0019"
             ],
             "explanation": "Signed IT script from the deployment agent inside the maintenance window."
         },
@@ -58,9 +58,9 @@
             "label": "benign",
             "title": "Approved software deployment",
             "event_ids": [
-                "SOC2-T-0019",
                 "SOC2-T-0020",
-                "SOC2-T-0021"
+                "SOC2-T-0021",
+                "SOC2-T-0022"
             ],
             "explanation": "Signed deployment from the agent with a maintenance record."
         },
@@ -69,7 +69,7 @@
             "label": "benign",
             "title": "Orphan process with missing parent telemetry",
             "event_ids": [
-                "SOC2-T-0022"
+                "SOC2-T-0023"
             ],
             "explanation": "Suspicious shape but no network or parent evidence; not a confirmed chain."
         },
@@ -78,10 +78,11 @@
             "label": "benign",
             "title": "PID reuse",
             "event_ids": [
-                "SOC2-T-0023",
-                "SOC2-T-0024"
+                "SOC2-T-0024",
+                "SOC2-T-0025"
             ],
             "explanation": "Same pid, different process GUIDs and images."
         }
-    ]
+    ],
+    "label_semantics": "malicious = part of the confirmed incident chain. benign = not part of a confirmed chain; it may still deserve triage (for example an orphan process)."
 }

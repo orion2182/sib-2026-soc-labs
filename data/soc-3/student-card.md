@@ -1,7 +1,7 @@
 # Kartu kasus SOC-3 - Beacon DNS dan jaringan
 
-**Untuk:** kelompok SOC-3 saja. **Dataset:** `data/soc-3/train/` (berlabel) dan
-`data/soc-3/holdout/` (tanpa label). **Kalender:** 20 November-18 Desember 2026.
+**Untuk:** kelompok SOC-3 saja. **Dataset:** `train/` (berlabel) dan
+`holdout/` (tanpa label). **Kalender:** 20 November-18 Desember 2026.
 
 ## Situasi
 
@@ -23,9 +23,9 @@ menunjukkan beacon, tanpa menganggap setiap alert sebagai insiden.
 
 | Artefak | Isi |
 | --- | --- |
-| `data/soc-3/train/events.jsonl` | Event latihan berlabel |
-| `data/soc-3/train/labels.json` | Label dan penjelasan |
-| `data/soc-3/holdout/events.jsonl` | Holdout tanpa label |
+| `train/events.jsonl` | Event latihan berlabel |
+| `train/labels.json` | Label dan penjelasan |
+| `holdout/events.jsonl` | Holdout tanpa label |
 | `schema.json` | Skema |
 | `data-dictionary.md` | Field dan gap |
 | `shared/public/` | Viewer lokal |
@@ -39,6 +39,29 @@ powershell -ExecutionPolicy Bypass -File .\tools\soc.ps1 -Action validate -Case 
 powershell -ExecutionPolicy Bypass -File .\tools\soc.ps1 -Action evaluate -Case soc-3 -Rule .\my-rule.json -Split train
 powershell -ExecutionPolicy Bypass -File .\tools\soc.ps1 -Action freeze -Case soc-3 -Rule .\my-rule.json
 ```
+
+## Format aturan
+
+Aturan adalah JSON. Bentuk event-level:
+
+```json
+{"name":"x","where":{"all":[{"field":"event_type","op":"eq","value":"dns.query"}]}}
+```
+
+Bentuk rangkaian:
+
+```json
+{"name":"y","group_by":"host","within_seconds":60,
+ "stages":[{ "all":[...] },{ "all":[...] }]}
+```
+
+Operator: `eq`, `ne`, `in`, `contains`, `startswith`, `gt`, `lt`, `exists`.
+Field harus ada di `schema.json`.
+
+Batasan engine: tidak ada aritmetika interval, OR, atau join antar-field. Untuk
+Q8, hitung selisih `event_time_utc` secara manual; aturan hanya menyatakan urutan
+dan window. Rangkaian yang lebih panjang dari stage akan menyisakan event sebagai
+FN; itu batas alat, bukan bukti deteksi gagal.
 
 ## Q1-Q12
 

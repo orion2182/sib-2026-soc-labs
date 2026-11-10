@@ -17,11 +17,11 @@
         "SOC1-T-0013": "benign",
         "SOC1-T-0014": "benign",
         "SOC1-T-0015": "benign",
-        "SOC1-T-0016": "malicious",
-        "SOC1-T-0017": "malicious",
-        "SOC1-T-0018": "malicious",
-        "SOC1-T-0019": "malicious",
-        "SOC1-T-0020": "malicious",
+        "SOC1-T-0016": "benign",
+        "SOC1-T-0017": "benign",
+        "SOC1-T-0018": "benign",
+        "SOC1-T-0019": "benign",
+        "SOC1-T-0020": "benign",
         "SOC1-T-0021": "malicious",
         "SOC1-T-0022": "malicious",
         "SOC1-T-0023": "malicious",
@@ -38,11 +38,11 @@
         "SOC1-T-0034": "malicious",
         "SOC1-T-0035": "malicious",
         "SOC1-T-0036": "malicious",
-        "SOC1-T-0037": "benign",
-        "SOC1-T-0038": "benign",
-        "SOC1-T-0039": "benign",
-        "SOC1-T-0040": "benign",
-        "SOC1-T-0041": "benign",
+        "SOC1-T-0037": "malicious",
+        "SOC1-T-0038": "malicious",
+        "SOC1-T-0039": "malicious",
+        "SOC1-T-0040": "malicious",
+        "SOC1-T-0041": "malicious",
         "SOC1-T-0042": "benign",
         "SOC1-T-0043": "benign",
         "SOC1-T-0044": "benign",
@@ -50,7 +50,13 @@
         "SOC1-T-0046": "benign",
         "SOC1-T-0047": "benign",
         "SOC1-T-0048": "benign",
-        "SOC1-T-0049": "benign"
+        "SOC1-T-0049": "benign",
+        "SOC1-T-0050": "benign",
+        "SOC1-T-0051": "benign",
+        "SOC1-T-0052": "benign",
+        "SOC1-T-0053": "benign",
+        "SOC1-T-0054": "benign",
+        "SOC1-T-0055": "benign"
     },
     "sequences": [
         {
@@ -58,11 +64,6 @@
             "label": "malicious",
             "title": "Credential stuffing to bulk export",
             "event_ids": [
-                "SOC1-T-0016",
-                "SOC1-T-0017",
-                "SOC1-T-0018",
-                "SOC1-T-0019",
-                "SOC1-T-0020",
                 "SOC1-T-0021",
                 "SOC1-T-0022",
                 "SOC1-T-0023",
@@ -78,7 +79,12 @@
                 "SOC1-T-0033",
                 "SOC1-T-0034",
                 "SOC1-T-0035",
-                "SOC1-T-0036"
+                "SOC1-T-0036",
+                "SOC1-T-0037",
+                "SOC1-T-0038",
+                "SOC1-T-0039",
+                "SOC1-T-0040",
+                "SOC1-T-0041"
             ],
             "explanation": "Repeated failures, success from the same unfamiliar device, sequential record reads, token refresh, then export."
         },
@@ -87,10 +93,10 @@
             "label": "benign",
             "title": "Approved travel sign-in",
             "event_ids": [
-                "SOC1-T-0037",
-                "SOC1-T-0038",
-                "SOC1-T-0039",
-                "SOC1-T-0040"
+                "SOC1-T-0042",
+                "SOC1-T-0043",
+                "SOC1-T-0044",
+                "SOC1-T-0045"
             ],
             "explanation": "New geography but a known device, own-record access only, and an approved travel window."
         },
@@ -99,10 +105,11 @@
             "label": "benign",
             "title": "Password retry",
             "event_ids": [
-                "SOC1-T-0041",
-                "SOC1-T-0042",
-                "SOC1-T-0043",
-                "SOC1-T-0044"
+                "SOC1-T-0046",
+                "SOC1-T-0047",
+                "SOC1-T-0048",
+                "SOC1-T-0049",
+                "SOC1-T-0050"
             ],
             "explanation": "Short failure run from the usual device, no object access afterwards."
         },
@@ -111,9 +118,9 @@
             "label": "benign",
             "title": "Scheduled admin maintenance",
             "event_ids": [
-                "SOC1-T-0045",
-                "SOC1-T-0046",
-                "SOC1-T-0047"
+                "SOC1-T-0051",
+                "SOC1-T-0052",
+                "SOC1-T-0053"
             ],
             "explanation": "Recorded maintenance window on the admin host."
         },
@@ -122,10 +129,11 @@
             "label": "benign",
             "title": "Shared address, ordinary behaviour",
             "event_ids": [
-                "SOC1-T-0048",
-                "SOC1-T-0049"
+                "SOC1-T-0054",
+                "SOC1-T-0055"
             ],
             "explanation": "Same source address as the suspicious chain but a known device and narrow access."
         }
-    ]
+    ],
+    "label_semantics": "malicious = part of the confirmed takeover chain. benign = not part of a confirmed chain; benign does not mean safe."
 }

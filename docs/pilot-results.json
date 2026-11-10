@@ -1,0 +1,35 @@
+﻿[
+    {
+        "case":  "soc-1",
+        "port":  8404,
+        "viewer_start_seconds":  0.64,
+        "healthy":  true,
+        "validate_seconds":  0.06,
+        "rss_mb":  20.1,
+        "private_mb":  9.2,
+        "dataset_kb":  33.5,
+        "host_ram_gb":  7.8
+    },
+    {
+        "case":  "soc-2",
+        "port":  8405,
+        "viewer_start_seconds":  0.54,
+        "healthy":  true,
+        "validate_seconds":  0.07,
+        "rss_mb":  20.2,
+        "private_mb":  9.2,
+        "dataset_kb":  22.3,
+        "host_ram_gb":  7.8
+    },
+    {
+        "case":  "soc-3",
+        "port":  8406,
+        "viewer_start_seconds":  0.54,
+        "healthy":  true,
+        "validate_seconds":  0.07,
+        "rss_mb":  20.1,
+        "private_mb":  9.2,
+        "dataset_kb":  23.8,
+        "host_ram_gb":  7.8
+    }
+]

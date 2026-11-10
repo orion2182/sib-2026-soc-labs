@@ -1,7 +1,7 @@
 # Kartu kasus SOC-1 — API account takeover
 
 **Untuk:** kelompok SOC-1 saja. **Kalender:** 20 November–18 Desember 2026.
-**Dataset:** `data/train/` (berlabel) dan `data/holdout/` (tanpa label).
+**Dataset:** `train/` (berlabel) dan `holdout/` (tanpa label).
 **Alat:** viewer lokal `tools\soc.ps1` dan CLI evaluasi. Tidak perlu SIEM.
 
 ## Situasi
@@ -25,9 +25,9 @@ pemeliharaan terjadwal.
 
 | Artefak | Isi |
 | --- | --- |
-| `data/train/events.jsonl` | Event latihan, satu JSON per baris |
-| `data/train/labels.json` | Label event dan penjelasan rangkaian latihan |
-| `data/holdout/events.jsonl` | Event holdout tanpa label |
+| `train/events.jsonl` | Event latihan, satu JSON per baris |
+| `train/labels.json` | Label event dan penjelasan rangkaian latihan |
+| `holdout/events.jsonl` | Event holdout tanpa label |
 | `schema.json` | Skema field dan sumber |
 | `data-dictionary.md` | Arti field, nilai, dan gap |
 | `shared/bin/cli.php` | Validasi, evaluasi aturan, pembekuan, paket |
@@ -84,6 +84,13 @@ Aturan adalah JSON. Dua bentuk didukung.
 Operator: `eq`, `ne`, `in`, `contains`, `startswith`, `gt`, `lt`, `exists`.
 Field harus ada di `schema.json`; field tak dikenal atau window tidak valid
 menghasilkan error validasi, bukan skor parsial.
+
+## Batasan engine
+
+Satu event dicocokkan per stage, `group_by` hanya satu field, dan tidak ada OR
+atau join antar-field. Rangkaian yang lebih panjang dari stage akan menyisakan
+event sebagai FN; itu batas alat, bukan bukti deteksi gagal. Aturan event-level
+juga diperbolehkan bila lebih tepat.
 
 ## Q1–Q12
 

@@ -74,5 +74,6 @@
             ],
             "explanation": "An IDS alert with no DNS or connection evidence."
         }
-    ]
+    ],
+    "label_semantics": "malicious = part of the confirmed beacon pattern. benign = not part of a confirmed incident; an uncorroborated alert may still deserve triage."
 }

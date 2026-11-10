@@ -14,9 +14,9 @@ bersifat sintetis.
 
 | Path | Fungsi |
 | --- | --- |
-| `data/train/events.jsonl` | Event latihan berlabel |
-| `data/train/labels.json` | Label dan penjelasan rangkaian latihan |
-| `data/holdout/events.jsonl` | Event holdout tanpa label |
+| `train/events.jsonl` | Event latihan berlabel |
+| `train/labels.json` | Label dan penjelasan rangkaian latihan |
+| `holdout/events.jsonl` | Event holdout tanpa label |
 | `schema.json` | Skema dan sumber |
 | `data-dictionary.md` | Arti field dan gap telemetri |
 | `student-card.md` | Kasus dan Q1–Q12 |

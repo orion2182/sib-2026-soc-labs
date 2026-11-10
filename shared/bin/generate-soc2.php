@@ -12,6 +12,19 @@ $root = soc_root();
 $sensors = ['endpoint' => 'edr-win-1', 'inventory' => 'cmdb-1', 'maintenance' => 'change-cal-1'];
 $counter = [];
 
+function neutral_note(string $type): string
+{
+    return match (true) {
+        str_starts_with($type, 'process.') => 'process record',
+        str_starts_with($type, 'script.') => 'script record',
+        str_starts_with($type, 'file.') => 'file record',
+        str_starts_with($type, 'network.') => 'network record',
+        str_starts_with($type, 'host.') => 'inventory record',
+        str_starts_with($type, 'maintenance.') => 'change record',
+        default => 'source record',
+    };
+}
+
 function s2_event(
     string $prefix,
     string $source,
@@ -42,6 +55,7 @@ function s2_event(
         'outcome' => 'success',
         'note' => '',
     ], $fields);
+    $event['note'] = neutral_note((string) $event['event_type']);
     $events[] = $event;
     $labels['event_labels'][$id] = $label;
     if ($seqId !== null) {
@@ -99,6 +113,13 @@ function build_soc2(string $prefix, string $day, array &$events, array &$labels,
         'parent_name' => 'explorer.exe', 'command_line' => 'C:\\Program Files\\Google\\Chrome\\chrome.exe', 'signer' => 'Google',
         'note' => 'Normal browser.',
     ], 'benign');
+    // Benign Office use gives the document stage a measurable false-positive cost.
+    $add('endpoint', $T . '09:30:00+07:00', [
+        'host' => 'WS-0142', 'account' => 'aurel@kampus.test', 'event_type' => 'process.create', 'outcome' => 'success',
+        'pid' => 1300, 'process_guid' => 'P-1300', 'parent_guid' => 'P-1000', 'process_name' => 'winword.exe',
+        'parent_name' => 'explorer.exe', 'command_line' => 'C:\\Program Files\\Office\\winword.exe "Memo.docx"',
+        'signer' => 'Microsoft', 'note' => 'Ordinary document opened by the user.',
+    ], 'benign');
 
     // Intended malicious chain.
     $base = new DateTimeImmutable($T . '09:00:00+07:00');
@@ -107,7 +128,7 @@ function build_soc2(string $prefix, string $day, array &$events, array &$labels,
         'pid' => 3000, 'process_guid' => 'P-3000', 'parent_guid' => 'P-0003', 'process_name' => 'explorer.exe',
         'parent_name' => 'userinit.exe', 'command_line' => 'C:\\Windows\\explorer.exe', 'signer' => 'Microsoft',
         'note' => 'Normal shell before the document is opened.',
-    ], 'benign', 'SEQ-EPR-T1');
+    ], 'benign');
     $add('endpoint', $base->modify('+5 minutes')->format('c'), [
         'host' => 'WS-0231', 'account' => 'rendra@kampus.test', 'event_type' => 'process.create', 'outcome' => 'success',
         'pid' => 3100, 'process_guid' => 'P-3100', 'parent_guid' => 'P-3000', 'process_name' => 'winword.exe',
@@ -201,6 +222,7 @@ function build_soc2(string $prefix, string $day, array &$events, array &$labels,
         'note' => 'Second, unrelated process with the reused pid.',
     ], 'benign', 'SEQ-PID-T1');
 
+    $labels['label_semantics'] = 'malicious = part of the confirmed incident chain. benign = not part of a confirmed chain; it may still deserve triage (for example an orphan process).';
     $labels['sequences'] = [
         ['sequence_id' => 'SEQ-EPR-T1', 'label' => 'malicious', 'title' => 'Document to encoded PowerShell to callback',
          'event_ids' => $seqEvents['SEQ-EPR-T1'] ?? [], 'explanation' => 'Winword spawns encoded PowerShell, writes a temp script, connects out, then stages a file.'],
