@@ -1,0 +1,42 @@
+{
+  "case_id": "SOC-1",
+  "case_name": "API account takeover",
+  "schema_version": "1.0.0",
+  "unit_of_evaluation": "event",
+  "timezone_policy": "event_time carries an explicit UTC offset; event_time_utc is the normalized UTC instant.",
+  "sources": ["auth", "session", "api"],
+  "required_fields": [
+    "event_id",
+    "case_id",
+    "schema_version",
+    "source",
+    "event_time",
+    "event_time_utc",
+    "sensor",
+    "account",
+    "event_type",
+    "outcome"
+  ],
+  "fields": {
+    "event_id": { "type": "string", "description": "Stable unique identifier, e.g. SOC1-T-0042." },
+    "case_id": { "type": "string", "description": "Always SOC-1 for this case." },
+    "schema_version": { "type": "string", "description": "Schema version of the record." },
+    "source": { "type": "string", "description": "auth, session, or api." },
+    "event_time": { "type": "string", "description": "Source timestamp with explicit offset." },
+    "event_time_utc": { "type": "string", "description": "Normalized UTC instant, derived from event_time." },
+    "sensor": { "type": "string", "description": "Collecting sensor or service." },
+    "account": { "type": "string", "description": "Synthetic account identity." },
+    "event_type": { "type": "string", "description": "Event category, e.g. auth.login." },
+    "outcome": { "type": "string", "description": "success, failure, denied, or allowed." },
+    "session_id": { "type": "string", "description": "Synthetic session reference." },
+    "device_id": { "type": "string", "description": "Synthetic device reference." },
+    "src_ip": { "type": "string", "description": "Documentation-only source address." },
+    "geo": { "type": "string", "description": "Coarse synthetic geography label." },
+    "object_type": { "type": "string", "description": "API object class." },
+    "object_id": { "type": "string", "description": "Synthetic object identifier." },
+    "bytes": { "type": "integer", "description": "Response size in bytes." },
+    "role": { "type": "string", "description": "Synthetic role at time of event." },
+    "note": { "type": "string", "description": "Short analyst-facing context." },
+    "raw": { "type": "object", "description": "Small source-shaped payload for realism." }
+  }
+}

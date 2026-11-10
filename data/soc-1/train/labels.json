@@ -1,0 +1,131 @@
+{
+    "case_id": "SOC-1",
+    "schema_version": "1.0.0",
+    "event_labels": {
+        "SOC1-T-0001": "benign",
+        "SOC1-T-0002": "benign",
+        "SOC1-T-0003": "benign",
+        "SOC1-T-0004": "benign",
+        "SOC1-T-0005": "benign",
+        "SOC1-T-0006": "benign",
+        "SOC1-T-0007": "benign",
+        "SOC1-T-0008": "benign",
+        "SOC1-T-0009": "benign",
+        "SOC1-T-0010": "benign",
+        "SOC1-T-0011": "benign",
+        "SOC1-T-0012": "benign",
+        "SOC1-T-0013": "benign",
+        "SOC1-T-0014": "benign",
+        "SOC1-T-0015": "benign",
+        "SOC1-T-0016": "malicious",
+        "SOC1-T-0017": "malicious",
+        "SOC1-T-0018": "malicious",
+        "SOC1-T-0019": "malicious",
+        "SOC1-T-0020": "malicious",
+        "SOC1-T-0021": "malicious",
+        "SOC1-T-0022": "malicious",
+        "SOC1-T-0023": "malicious",
+        "SOC1-T-0024": "malicious",
+        "SOC1-T-0025": "malicious",
+        "SOC1-T-0026": "malicious",
+        "SOC1-T-0027": "malicious",
+        "SOC1-T-0028": "malicious",
+        "SOC1-T-0029": "malicious",
+        "SOC1-T-0030": "malicious",
+        "SOC1-T-0031": "malicious",
+        "SOC1-T-0032": "malicious",
+        "SOC1-T-0033": "malicious",
+        "SOC1-T-0034": "malicious",
+        "SOC1-T-0035": "malicious",
+        "SOC1-T-0036": "malicious",
+        "SOC1-T-0037": "benign",
+        "SOC1-T-0038": "benign",
+        "SOC1-T-0039": "benign",
+        "SOC1-T-0040": "benign",
+        "SOC1-T-0041": "benign",
+        "SOC1-T-0042": "benign",
+        "SOC1-T-0043": "benign",
+        "SOC1-T-0044": "benign",
+        "SOC1-T-0045": "benign",
+        "SOC1-T-0046": "benign",
+        "SOC1-T-0047": "benign",
+        "SOC1-T-0048": "benign",
+        "SOC1-T-0049": "benign"
+    },
+    "sequences": [
+        {
+            "sequence_id": "SEQ-ATO-T1",
+            "label": "malicious",
+            "title": "Credential stuffing to bulk export",
+            "event_ids": [
+                "SOC1-T-0016",
+                "SOC1-T-0017",
+                "SOC1-T-0018",
+                "SOC1-T-0019",
+                "SOC1-T-0020",
+                "SOC1-T-0021",
+                "SOC1-T-0022",
+                "SOC1-T-0023",
+                "SOC1-T-0024",
+                "SOC1-T-0025",
+                "SOC1-T-0026",
+                "SOC1-T-0027",
+                "SOC1-T-0028",
+                "SOC1-T-0029",
+                "SOC1-T-0030",
+                "SOC1-T-0031",
+                "SOC1-T-0032",
+                "SOC1-T-0033",
+                "SOC1-T-0034",
+                "SOC1-T-0035",
+                "SOC1-T-0036"
+            ],
+            "explanation": "Repeated failures, success from the same unfamiliar device, sequential record reads, token refresh, then export."
+        },
+        {
+            "sequence_id": "SEQ-TRV-T1",
+            "label": "benign",
+            "title": "Approved travel sign-in",
+            "event_ids": [
+                "SOC1-T-0037",
+                "SOC1-T-0038",
+                "SOC1-T-0039",
+                "SOC1-T-0040"
+            ],
+            "explanation": "New geography but a known device, own-record access only, and an approved travel window."
+        },
+        {
+            "sequence_id": "SEQ-RET-T1",
+            "label": "benign",
+            "title": "Password retry",
+            "event_ids": [
+                "SOC1-T-0041",
+                "SOC1-T-0042",
+                "SOC1-T-0043",
+                "SOC1-T-0044"
+            ],
+            "explanation": "Short failure run from the usual device, no object access afterwards."
+        },
+        {
+            "sequence_id": "SEQ-ADM-T1",
+            "label": "benign",
+            "title": "Scheduled admin maintenance",
+            "event_ids": [
+                "SOC1-T-0045",
+                "SOC1-T-0046",
+                "SOC1-T-0047"
+            ],
+            "explanation": "Recorded maintenance window on the admin host."
+        },
+        {
+            "sequence_id": "SEQ-NAT-T1",
+            "label": "benign",
+            "title": "Shared address, ordinary behaviour",
+            "event_ids": [
+                "SOC1-T-0048",
+                "SOC1-T-0049"
+            ],
+            "explanation": "Same source address as the suspicious chain but a known device and narrow access."
+        }
+    ]
+}
